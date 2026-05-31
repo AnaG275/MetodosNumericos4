@@ -1,5 +1,4 @@
 # Método de la Secante
-```python
 def metodo_secante(funcion, anterior, actual, tol=1e-6, iter_max=100):
 
     print(f"{'Paso':<8}{'Aprox.':<15}{'f(x)':<15}{'Diferencia':<15}")
@@ -56,5 +55,3 @@ def funcion2(x):
     return x**3 - 8
 
 metodo_secante(funcion2, 1.0, 3.0)
-
-```
