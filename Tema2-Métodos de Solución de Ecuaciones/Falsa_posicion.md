@@ -1,4 +1,4 @@
-# Método de Falsa Posición (Regula Falsi)
+# Método de Falsa Posición 
 
 ## Definición
 El método de Falsa Posición combina ideas de Bisección y la Secante. Mantiene
