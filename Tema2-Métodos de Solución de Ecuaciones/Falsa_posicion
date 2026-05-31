@@ -1,78 +1,58 @@
-# Método de Falsa Posición (Regula Falsi)
+# Método de la Secante
 
-## Definición
-El método de Falsa Posición combina ideas de Bisección y la Secante. Mantiene
-un intervalo [a, b] con cambio de signo (como Bisección) pero en lugar de
-tomar el punto medio usa una línea secante entre (a, f(a)) y (b, f(b)) para
-estimar la raíz. Converge más rápido que Bisección en la mayoría de los casos,
-aunque puede ser **lento si un extremo queda fijo** muchas iteraciones seguidas.
+def metodo_secante(funcion, anterior, actual, tol=1e-6, iter_max=100):
 
+    print(f"{'Paso':<8}{'Aprox.':<15}{'f(x)':<15}{'Diferencia':<15}")
+    print("=" * 55)
 
-## Fórmula
+    contador = 0
 
-c = b - f(b) * (b - a) / (f(b) - f(a))
+    while contador < iter_max:
 
-Error acotado en cada paso:
+        fa = funcion(anterior)
+        fb = funcion(actual)
 
-|f(c)| → 0  con  f(a)*f(b) < 0  garantizado
+        if abs(fb - fa) < 1e-12:
+            print("\nNo es posible continuar: denominador cercano a cero.")
+            return None
 
-Donde:
-- a = extremo izquierdo del intervalo
-- b = extremo derecho del intervalo
-- c = nueva aproximación de la raíz (intersección de la secante con el eje x)
-- Criterio de paro: |f(c)| < tolerancia
+        siguiente = actual - (fb * (actual - anterior)) / (fb - fa)
 
+        diferencia = abs(siguiente - actual)
 
-## Algoritmo
-Verificar que f(a) * f(b) < 0 (cambio de signo en el intervalo)
-Calcular c = b - f(b) * (b - a) / (f(b) - f(a))
-Si |f(c)| < tolerancia → retornar c como raíz
-Si f(a) * f(c) < 0 → la raíz está en [a, c], hacer b = c
-Si f(b) * f(c) < 0 → la raíz está en [c, b], hacer a = c
-Repetir desde el paso 2
+        print(
+            f"{contador+1:<8}"
+            f"{siguiente:<15.6f}"
+            f"{funcion(siguiente):<15.6f}"
+            f"{diferencia:<15.6f}"
+        )
 
+        if diferencia <= tol:
+            print(f"\nSolución aproximada: {siguiente:.6f}")
+            print(f"Iteraciones realizadas: {contador+1}")
+            return siguiente
 
-## Ejemplo
+        anterior = actual
+        actual = siguiente
+        contador += 1
 
-f(x) = x² - 2     Intervalo [1, 2]     f(1) = -1     f(2) = 2
-
-iter 1: c = 2 - 2*(2-1)/(2-(-1))   = 1.33333   f(c) = -0.2222
-iter 2: c = 2 - 2*(2-1.3333)/...   = 1.40000   f(c) = -0.0400
-iter 3: c = 2 - 2*(2-1.4000)/...   = 1.41176   f(c) = -0.0069
-iter 4: c = 2 - 2*(2-1.41176)/...  = 1.41379   f(c) = -0.0012
-...
-Raíz exacta: √2 = 1.41421356237309504...
+    print("\nSe alcanzó el número máximo de iteraciones.")
+    return None
 
 
-## Ejemplo y Caso de Prueba
+# Ejemplo
+print("=== Ejemplo: f(x) = x² - 5 ===")
 
-**Caso de prueba:** f(x) = x² - 2, a = 1, b = 2, tolerancia = 1e-6
+def funcion1(x):
+    return x**2 - 5
 
-| n  | a            | b            | c            | f(c)         | extremo fijo |
-|----|--------------|--------------|--------------|--------------|--------------|
-| 1  | 1.0000000000 | 2.0000000000 | 1.3333333333 | -2.2222e-1   | b fijo       |
-| 2  | 1.3333333333 | 2.0000000000 | 1.4000000000 | -4.0000e-2   | b fijo       |
-| 3  | 1.4000000000 | 2.0000000000 | 1.4117647059 | -6.9204e-3   | b fijo       |
-| 4  | 1.4117647059 | 2.0000000000 | 1.4137931034 | -1.1890e-3   | b fijo       |
-| 5  | 1.4137931034 | 2.0000000000 | 1.4141414141 | -2.0388e-4   | b fijo       |
-| …  | …            | …            | …            | …            | b fijo       |
-| 13 | 1.4142134534 | 2.0000000000 | 1.4142135534 | -6.0396e-8   | b fijo       |
+metodo_secante(funcion1, 2.0, 3.0)
 
-**Ejercicio:** f(x) = x³ - x - 2, a = 1, b = 2, tolerancia = 1e-6
 
-| n  | a            | b            | c            | f(c)         | extremo fijo |
-|----|--------------|--------------|--------------|--------------|--------------|
-| 1  | 1.0000000000 | 2.0000000000 | 1.3333333333 | -1.0370e+0   | b fijo       |
-| 2  | 1.3333333333 | 2.0000000000 | 1.4594594595 | -4.4547e-1   | b fijo       |
-| 3  | 1.4594594595 | 2.0000000000 | 1.5028653296 | -1.5532e-1   | b fijo       |
-| 4  | 1.5028653296 | 2.0000000000 | 1.5160060580 | -5.0318e-2   | b fijo       |
-| 5  | 1.5160060580 | 2.0000000000 | 1.5200073846 | -1.5957e-2   | b fijo       |
-| …  | …            | …            | …            | …            | b fijo       |
-| 14 | 1.5213796622 | 2.0000000000 | 1.5213797054 | -4.7576e-8   | b fijo       |
+# Ejercicio
+print("\n=== Ejercicio: f(x) = x³ - 8 ===")
 
-**Resultado:**
-- Entrada: f(x) = x³ - x - 2, a = 1, b = 2, tolerancia = 1e-6
-- Resultado esperado: 1.5213
-- Resultado float:    1.5213
-- Iteraciones:        14
-- Error acumulado:    2.74e-11
+def funcion2(x):
+    return x**3 - 8
+
+metodo_secante(funcion2, 1.0, 3.0)
